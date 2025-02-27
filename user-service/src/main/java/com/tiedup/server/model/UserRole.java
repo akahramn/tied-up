@@ -1,4 +1,4 @@
-package com.tiedup.server;
+package com.tiedup.server.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,7 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_roles")
+@Table(name = "user_role", schema = "user-service")
 @Getter
 @Setter
 @NoArgsConstructor

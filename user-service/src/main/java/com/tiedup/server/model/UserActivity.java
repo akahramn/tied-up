@@ -1,4 +1,4 @@
-package com.tiedup.server;
+package com.tiedup.server.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,14 +8,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_tokens", schema = "user-service")
+@Table(name = "user_activity", schema = "user-service")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class UserToken {
+public class UserActivity {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -26,12 +25,9 @@ public class UserToken {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "refresh_token", nullable = false, length = 500)
-    private String refreshToken;
+    @Column(name = "activity_type", nullable = false, length = 100)
+    private String activityType;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Column(name = "activity_date")
+    private LocalDateTime activityDate = LocalDateTime.now();
 }
