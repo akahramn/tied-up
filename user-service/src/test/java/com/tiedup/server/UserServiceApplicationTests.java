@@ -1,4 +1,4 @@
-package com.tiedup.user_service;
+package com.tiedup.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
