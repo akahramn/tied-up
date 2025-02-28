@@ -1,36 +1,35 @@
-package com.tiedup.server.model;
+package com.tiedup.server.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_log", schema = "user-service")
+@Table(name = "user_profile", schema = "user-service")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserLog {
+public class UserProfile {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "record_id", updatable = false, nullable = false)
-    private UUID recordId;
+    private UUID id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "action_type", nullable = false, length = 50)
-    private String actionType;
+    @Column(name = "bio")
+    private String bio;
 
-    @Column(name = "action_details")
-    private String actionDetails;
+    @Column(name = "expertise_area")
+    private String expertiseArea;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-}
+    @Column(name = "course_count", columnDefinition = "INT DEFAULT 0")
+    private Integer courseCount;
+    }

@@ -1,4 +1,4 @@
-package com.tiedup.server.model;
+package com.tiedup.server.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,19 +23,19 @@ public class User implements UserDetails {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "record_id", updatable = false, nullable = false)
-    private UUID recordId;
+    private UUID id;
 
     @Column(name = "email", unique = true, nullable = false, length = 255)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @Column(name = "first_name", nullable = false, length = 100)
-    private String firstName;
+    private String firstname;
 
     @Column(name = "last_name", nullable = false, length = 100)
-    private String lastName;
+    private String lastname;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -62,7 +62,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return passwordHash;
+        return password;
     }
 
     @Override
