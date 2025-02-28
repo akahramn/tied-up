@@ -1,4 +1,4 @@
-package com.tiedup.server.model;
+package com.tiedup.server.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +18,7 @@ public class UserRole {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "record_id", updatable = false, nullable = false)
-    private UUID recordId;
+    private UUID id;
 
     @Column(name = "role_name", unique = true, nullable = false, length = 50)
     private String roleName;
