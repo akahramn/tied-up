@@ -1,4 +1,4 @@
-package com.tiedup.server.model;
+package com.tiedup.server.user.model;
 
 public enum Role {
     ADMIN,
