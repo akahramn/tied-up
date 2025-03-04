@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -122,5 +123,15 @@ public class AuthenticationService {
         String token = jwtService.generateToken(user);
         saveUserToken(user, token);
         mailService.sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        String token = request.getToken();
+        String username = jwtService.extractUsername(token);
+        UserDetails userDetails = userService.findByEmail(username);
+        if (jwtService.isTokenValid(token, userDetails)) {
+            String hashedPassword = passwordEncoder.encode(request.getPassword());
+            userService.updatePassword(username, hashedPassword);
+        }
     }
 }

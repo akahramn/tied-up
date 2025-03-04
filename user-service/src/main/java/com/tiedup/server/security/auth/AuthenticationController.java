@@ -42,11 +42,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/reset-password")
-    public void resetPassword(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        service.refreshToken(request, response);
+    public ResponseEntity<?> resetPassword(
+            @RequestBody ResetPasswordRequest request
+    ) {
+        service.resetPassword(request);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/forgot-password")
