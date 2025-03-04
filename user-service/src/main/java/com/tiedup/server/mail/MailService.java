@@ -18,7 +18,8 @@ public class MailService {
         String subject = "Şifre Sıfırlama Talebi";
         String content = "<p>Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:</p>"
                 + "<p><a href=\"" + resetLink + "\">Şifremi Sıfırla</a></p>"
-                + "<p>Bu bağlantı 30 dakika içinde geçersiz olacaktır.</p>";
+                + "<p>Bu bağlantı 30 dakika içinde geçersiz olacaktır.</p>"
+                + "<p>Eğer şifre sıfırlama talebinde bulunmadıysanız, bu e-postayı görmezden gelebilirsiniz.";
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
