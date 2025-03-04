@@ -1,5 +1,6 @@
 package com.tiedup.server.security.token;
 
 public enum TokenType {
-    BEARER
+    BEARER,
+    PASSWORD_RESET
 }
