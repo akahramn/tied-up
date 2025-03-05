@@ -1,4 +1,4 @@
-package com.tiedup.server.security.auth;
+package com.tiedup.server.security.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

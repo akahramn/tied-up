@@ -1,5 +1,7 @@
-package com.tiedup.server.security.auth;
+package com.tiedup.server.security.auth.controller;
 
+import com.tiedup.server.security.auth.dto.*;
+import com.tiedup.server.security.auth.service.AuthenticationService;
 import com.tiedup.server.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,11 +28,12 @@ public class AuthenticationController {
     ) {
         return ResponseEntity.ok(service.register(request));
     }
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
+            @RequestBody AuthenticationRequest request,
+            HttpServletRequest httpServletRequest
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ResponseEntity.ok(service.login(request, httpServletRequest));
     }
 
     @PostMapping("/refresh-token")
