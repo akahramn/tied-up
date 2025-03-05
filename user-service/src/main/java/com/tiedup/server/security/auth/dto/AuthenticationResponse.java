@@ -1,4 +1,4 @@
-package com.tiedup.server.security.auth;
+package com.tiedup.server.security.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

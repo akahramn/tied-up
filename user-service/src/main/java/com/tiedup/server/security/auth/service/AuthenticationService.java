@@ -1,12 +1,14 @@
-package com.tiedup.server.security.auth;
+package com.tiedup.server.security.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiedup.server.mail.MailService;
+import com.tiedup.server.security.auth.dto.*;
 import com.tiedup.server.security.config.JwtService;
 import com.tiedup.server.security.token.Token;
 import com.tiedup.server.security.token.TokenRepository;
 import com.tiedup.server.security.token.TokenType;
 import com.tiedup.server.user.model.User;
+import com.tiedup.server.user.service.UserActivityService;
 import com.tiedup.server.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +33,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
+    private final UserActivityService userActivityService;
 
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
@@ -50,7 +53,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse login(AuthenticationRequest request, HttpServletRequest httpRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -62,6 +65,9 @@ public class AuthenticationService {
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+
+        // Kullanıcı aktivitesini kaydet
+        userActivityService.logActivity(user.getId(), "login", "Kullanıcı giriş yaptı", httpRequest);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
