@@ -6,13 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserActivityService userActivityService;
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
