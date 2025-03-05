@@ -1,5 +1,6 @@
 package com.tiedup.server.user.model;
 
+import com.tiedup.server.user.dto.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;

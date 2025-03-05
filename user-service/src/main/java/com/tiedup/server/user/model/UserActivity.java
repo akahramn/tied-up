@@ -1,5 +1,6 @@
 package com.tiedup.server.user.model;
 
+import com.tiedup.server.user.dto.ActivityType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -18,16 +19,30 @@ public class UserActivity {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "record_id", updatable = false, nullable = false)
+    @Column(name = "activity_id", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "activity_type", nullable = false, length = 100)
-    private String activityType;
+    private ActivityType activityType; // login, logout, profile_update, password_change, lesson_enrolled
 
-    @Column(name = "activity_date")
-    private LocalDateTime activityDate = LocalDateTime.now();
+    @Column(name = "activity_details", columnDefinition = "TEXT")
+    private String activityDetails; // Örn: "Kullanıcı profil bilgilerini güncelledi."
+
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress; // Kullanıcının IP adresi
+
+    @Column(name = "user_agent", columnDefinition = "TEXT")
+    private String userAgent; // Kullanıcının tarayıcı bilgisi
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
