@@ -32,7 +32,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.register(request));
     }
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(
+    public ResponseEntity<?> authenticate(
             @RequestBody AuthenticationRequest request,
             HttpServletRequest httpServletRequest
     ) {
@@ -41,8 +41,7 @@ public class AuthenticationController {
 
         // Rate limit kontrolü
         if (!rateLimiterService.isAllowed(clientIp)) {
-            //return ResponseEntity.status(429).body("Çok fazla giriş denemesi yaptınız. Lütfen 10 dakika sonra tekrar deneyin.");
-            return ResponseEntity.status(429).build();
+            return ResponseEntity.status(429).body("Çok fazla giriş denemesi yaptınız. Lütfen 10 dakika sonra tekrar deneyin.");
         }
         return ResponseEntity.ok(service.login(request, httpServletRequest));
     }

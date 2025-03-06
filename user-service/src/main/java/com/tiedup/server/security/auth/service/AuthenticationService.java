@@ -67,7 +67,7 @@ public class AuthenticationService {
         saveUserToken(user, jwtToken);
 
         // Kullanıcı aktivitesini kaydet
-        userActivityService.logActivity(user.getId(), "login", "Kullanıcı giriş yaptı", httpRequest);
+        userActivityService.logActivity(user.getId(), "LOGIN", "Kullanıcı giriş yaptı", httpRequest);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
