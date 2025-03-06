@@ -1,4 +1,4 @@
-package com.tiedup.server.user.dto;
+package com.tiedup.server.user.type;
 
 public enum Role {
     ADMIN,

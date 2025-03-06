@@ -1,6 +1,6 @@
 package com.tiedup.server.security.auth.dto;
 
-import com.tiedup.server.user.dto.Role;
+import com.tiedup.server.user.type.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
