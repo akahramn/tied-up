@@ -1,7 +1,9 @@
 package com.tiedup.server.security.auth.controller;
 
+import com.tiedup.server.redis.RedisRateLimiterService;
 import com.tiedup.server.security.auth.dto.*;
 import com.tiedup.server.security.auth.service.AuthenticationService;
+import com.tiedup.server.security.config.RateLimiterFilter;
 import com.tiedup.server.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +23,7 @@ public class AuthenticationController {
 
     private final AuthenticationService service;
     private final UserService userService;
+    private final RedisRateLimiterService rateLimiterService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -33,6 +36,14 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request,
             HttpServletRequest httpServletRequest
     ) {
+        // Kullanıcının IP adresini al
+        String clientIp = httpServletRequest.getRemoteAddr();
+
+        // Rate limit kontrolü
+        if (!rateLimiterService.isAllowed(clientIp)) {
+            //return ResponseEntity.status(429).body("Çok fazla giriş denemesi yaptınız. Lütfen 10 dakika sonra tekrar deneyin.");
+            return ResponseEntity.status(429).build();
+        }
         return ResponseEntity.ok(service.login(request, httpServletRequest));
     }
 
