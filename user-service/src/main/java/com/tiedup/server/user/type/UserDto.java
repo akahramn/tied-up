@@ -1,6 +1,5 @@
-package com.tiedup.server.user.dto;
+package com.tiedup.server.user.type;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 
 @Data

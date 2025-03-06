@@ -1,6 +1,6 @@
 package com.tiedup.server.user.controller;
 
-import com.tiedup.server.user.dto.UserDto;
+import com.tiedup.server.user.type.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
