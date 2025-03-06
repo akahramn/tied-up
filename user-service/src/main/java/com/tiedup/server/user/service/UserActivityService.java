@@ -1,6 +1,6 @@
 package com.tiedup.server.user.service;
 
-import com.tiedup.server.user.dto.ActivityType;
+import com.tiedup.server.user.type.ActivityType;
 import com.tiedup.server.user.model.UserActivity;
 import com.tiedup.server.user.repository.UserActivityRepository;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,6 +1,6 @@
 package com.tiedup.server.user.model;
 
-import com.tiedup.server.user.dto.ActivityType;
+import com.tiedup.server.user.type.ActivityType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
