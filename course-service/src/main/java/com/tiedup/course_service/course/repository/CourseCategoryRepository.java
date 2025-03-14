@@ -1,6 +1,6 @@
-package com.tiedup.course_service.repository;
+package com.tiedup.course_service.course.repository;
 
-import com.tiedup.course_service.model.CourseCategory;
+import com.tiedup.course_service.course.model.CourseCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
