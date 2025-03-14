@@ -1,5 +1,6 @@
-package com.tiedup.course_service.model;
+package com.tiedup.course_service.course.model;
 
+import com.tiedup.course_service.course.type.CourseStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -35,8 +36,9 @@ public class Course {
     @Column(name = "price", precision = 10, scale = 2, nullable = false)
     private BigDecimal price = BigDecimal.ZERO;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "ACTIVE"; // ACTIVE, INACTIVE, DRAFT
+    private CourseStatus status = CourseStatus.ACTIVE; // ACTIVE, INACTIVE, DRAFT
 
     @Column(name = "instructor_id", nullable = false)
     private UUID instructorId; // User Service’ten gelen eğitmen ID’si
