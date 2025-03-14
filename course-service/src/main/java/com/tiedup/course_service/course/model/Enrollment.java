@@ -1,4 +1,4 @@
-package com.tiedup.course_service.model;
+package com.tiedup.course_service.course.model;
 
 import jakarta.persistence.*;
 import lombok.*;
