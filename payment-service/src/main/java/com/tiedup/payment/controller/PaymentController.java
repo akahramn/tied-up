@@ -1,5 +1,6 @@
 package com.tiedup.payment.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tiedup.payment.dto.PaymentRequest;
 import com.tiedup.payment.dto.PaymentResponse;
 import com.tiedup.payment.service.PaymentService;
@@ -17,7 +18,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<PaymentResponse> processPayment(@Valid @RequestBody PaymentRequest request) {
+    public ResponseEntity<PaymentResponse> processPayment(@RequestBody PaymentRequest request) throws JsonProcessingException {
         return ResponseEntity.ok(paymentService.processPayment(request));
     }
 

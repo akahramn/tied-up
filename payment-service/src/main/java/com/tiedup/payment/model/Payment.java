@@ -3,14 +3,13 @@ package com.tiedup.payment.model;
 import com.tiedup.payment.type.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payment", schema = "payment")
 @Getter
 @Setter
 @NoArgsConstructor
