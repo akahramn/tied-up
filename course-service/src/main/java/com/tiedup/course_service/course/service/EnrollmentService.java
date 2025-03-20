@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 public class EnrollmentService {
     @Value("${payment.kafka.topic}")
     private String topicName;
-
+    //TODO belirli bir sınıf tipinde nasıl yollanıyor arastır
     @KafkaListener(topics = "${payment.kafka.topic}", groupId = "course-service-group")
-    public void enrollStudent(PaymentEvent event) {
-        System.out.println("Kafka'dan ödeme mesajı alındı, öğrenci derse kayıt ediliyor: " + event.getUserId());
+    public void enrollStudent(String event) {
+        System.out.println("Kafka'dan ödeme mesajı alındı, öğrenci derse kayıt ediliyor: " + event);
         // Course Service içinde öğrenciyi kayıt eden metodu çağır
     }
 }
