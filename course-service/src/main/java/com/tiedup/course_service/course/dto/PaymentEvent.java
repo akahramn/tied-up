@@ -1,14 +1,14 @@
 package com.tiedup.course_service.course.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PaymentEvent {
     private UUID userId;
     private UUID courseId;

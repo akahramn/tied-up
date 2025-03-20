@@ -1,5 +1,7 @@
 package com.tiedup.payment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiedup.payment.dto.PaymentEvent;
 import com.tiedup.payment.dto.PaymentRequest;
 import com.tiedup.payment.dto.PaymentResponse;
@@ -21,7 +23,7 @@ public class PaymentService {
     private final PaymentEventProducer paymentEventProducer; // Kafka Producer
 
     @Transactional
-    public PaymentResponse processPayment(PaymentRequest request) {
+    public PaymentResponse processPayment(PaymentRequest request) throws JsonProcessingException {
         Payment payment = Payment.builder()
                 .userId(request.getUserId())
                 .courseId(request.getCourseId())
@@ -47,7 +49,7 @@ public class PaymentService {
         //todo course servise iletilecek
         // Kafka'ya mesaj gönder
         PaymentEvent event = new PaymentEvent(payment.getUserId(), payment.getCourseId(), "COMPLETED");
-        paymentEventProducer.sendPaymentEvent(event);
+        paymentEventProducer.sendPaymentEvent(new ObjectMapper().writeValueAsString(event));
 
         return mapToPaymentResponse(payment);
     }
