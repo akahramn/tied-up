@@ -7,7 +7,7 @@ function App() {
   return (
       <BrowserRouter>
         <Routes>
-          <Route path="/live/:sessionId" element={<LiveSession />} />
+          <Route path="/live/:isInstructor" element={<LiveSession />} />
         </Routes>
       </BrowserRouter>
   );

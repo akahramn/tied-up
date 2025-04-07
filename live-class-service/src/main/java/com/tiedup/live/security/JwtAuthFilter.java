@@ -1,6 +1,6 @@
 package com.tiedup.live.security;
 
-import com.tiedup.course_service.security.CurrentUser;
+import com.tiedup.live.security.CurrentUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
