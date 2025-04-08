@@ -1,14 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WebRTCService from '../services/WebRTCService';
 import {useParams} from "react-router-dom";
+import {Button, Space} from "antd";
+import Title from "antd/es/skeleton/Title";
 
 const LiveSession = () => {
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const {isInstructor} = useParams();
     const [webRTCService, setWebRTCService] = useState(null);
+    const initialized = useRef(false);
 
-    console.log("Deneme",isInstructor);
     // Örnek sabit oda ID (gerçek sistemde dinamik olmalı)
     const roomId = 'demo-room';
 
@@ -16,6 +18,9 @@ const LiveSession = () => {
     //const isInstructor = false; // TODO: Kullanıcının rolüne göre ayarla
 
     useEffect(() => {
+        if (initialized.current) return;
+        initialized.current = true;
+
         const init = async () => {
             const service = new WebRTCService({
                 roomId,
@@ -24,6 +29,7 @@ const LiveSession = () => {
                 isInitiator: isInstructor == 1 ? true : false,
             });
 
+            console.log("DATAAA");
             await service.initialize();
             setWebRTCService(service);
         };
@@ -37,53 +43,48 @@ const LiveSession = () => {
         }
     };
 
+    const handleShareScreen = async () => {
+        if (webRTCService) {
+            await webRTCService.shareScreen();
+        }
+    };
+
+
     return (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <h2>📡 Canlı Ders Oturumu</h2>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <Title level={2}>Canlı Ders (WebRTC)</Title>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem' }}>
-                <div>
-                    <p><strong>Kendi Görüntün</strong></p>
-                    <video
-                        ref={localVideoRef}
-                        autoPlay
-                        muted
-                        playsInline
-                        width={320}
-                        height={240}
-                        style={{ border: '1px solid #ccc', borderRadius: '8px' }}
-                    />
-                </div>
-                <div>
-                    <p><strong>Karşı Tarafın Görüntüsü</strong></p>
-                    <video
-                        ref={remoteVideoRef}
-                        autoPlay
-                        playsInline
-                        width={320}
-                        height={240}
-                        style={{ border: '1px solid #ccc', borderRadius: '8px' }}
-                    />
-                </div>
-            </div>
+            <Space style={{ justifyContent: 'center', marginBottom: '2rem' }}>
+                <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    width={320}
+                    height={240}
+                    style={{ border: '1px solid #ccc' }}
+                />
+                <video
+                    ref={remoteVideoRef}
+                    autoPlay
+                    playsInline
+                    width={320}
+                    height={240}
+                    style={{ border: '1px solid #ccc' }}
+                />
+            </Space>
 
-            {isInstructor == 1 && (
-                <button
-                    onClick={handleStartCall}
-                    style={{
-                        marginTop: '2rem',
-                        padding: '10px 20px',
-                        fontSize: '1rem',
-                        backgroundColor: '#1890ff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                    }}
-                >
+            {isInstructor == 1 &&
+            <Space direction="vertical">
+                <Button type="primary" onClick={handleStartCall}>
                     Bağlantıyı Başlat (Eğitmen)
-                </button>
-            )}
+                </Button>
+
+                <Button onClick={handleShareScreen} disabled={!isInstructor}>
+                    Ekran Paylaşımı Başlat
+                </Button>
+            </Space>
+            }
         </div>
     );
 };

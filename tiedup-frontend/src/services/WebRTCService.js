@@ -19,10 +19,9 @@ class WebRTCService {
 
         this.offerReceived = false;
         this.connectionStarted = false;
-
         this.pendingCandidates = [];
-        this.remoteDescriptionSet = false;
     }
+
 
     async initialize() {
         await this.setupLocalMedia();
@@ -48,8 +47,9 @@ class WebRTCService {
             iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
         });
 
+        // 📡 signalingState değişimlerini takip et
         this.peer.onsignalingstatechange = () => {
-            console.log("📶 signalingState:", this.peer.signalingState);
+            console.log("📶 signalingState değişti:", this.peer.signalingState);
         };
 
         this.peer.onicecandidate = (event) => {
@@ -72,12 +72,16 @@ class WebRTCService {
         }
     }
 
+
+
     connectSignalingServer() {
         this.socket = new WebSocket(`ws://localhost:8090/ws/signal`);
 
         this.socket.onopen = () => {
             console.log("🔌 WebSocket bağlantısı kuruldu.");
-            this.sendMessage({ type: 'join' });
+            if (this.socket.readyState === WebSocket.OPEN) {
+                this.sendMessage({ type: 'join' });
+            }
         };
 
         this.socket.onmessage = async (event) => {
@@ -124,6 +128,7 @@ class WebRTCService {
         console.log("📤 Offer gönderildi.");
     }
 
+
     async handleOffer(offer) {
         if (this.isInitiator) {
             console.warn("⛔ Bu taraf initiator, offer işlenmeyecek.");
@@ -133,13 +138,28 @@ class WebRTCService {
         this.offerReceived = true;
 
         await this.peer.setRemoteDescription(new RTCSessionDescription(offer));
-        this.remoteDescriptionSet = true;
-
         const answer = await this.peer.createAnswer();
         await this.peer.setLocalDescription(answer);
 
         this.sendMessage({ type: 'answer', answer });
         console.log("📤 Answer gönderildi.");
+    }
+
+
+    async handleAnswer(answer) {
+        if (!this.isInitiator) {
+            console.warn("⛔ Initiator olmayan biri answer aldı.");
+            return;
+        }
+
+        if (!this.peer || this.peer.signalingState !== 'have-local-offer') {
+            console.warn("⛔ Answer yanlış durumda alındı:", this.peer?.signalingState);
+            return;
+        }
+
+        await this.peer.setRemoteDescription(new RTCSessionDescription(answer));
+        this.remoteDescriptionSet = true;
+        console.log("✅ Answer başarıyla set edildi.");
 
         // ICE kuyruğunu işleyelim
         this.pendingCandidates.forEach(async (candidate) => {
@@ -151,44 +171,6 @@ class WebRTCService {
         });
         this.pendingCandidates = [];
     }
-
-    async handleAnswer(answer) {
-        if (!this.isInitiator) {
-            console.warn("⛔ Initiator olmayan biri answer aldı.");
-            return;
-        }
-
-        if (!this.peer) {
-            console.warn("⚠️ Peer tanımsız, answer işlenemiyor.");
-            return;
-        }
-
-        // 🔐 Stable durumdayken tekrar setRemoteDescription çağrılmamalı
-        if (this.peer.signalingState === 'stable') {
-            console.warn("⛔ Zaten stable durumdayız, answer set edilmeyecek.");
-            return;
-        }
-
-        try {
-            await this.peer.setRemoteDescription(new RTCSessionDescription(answer));
-            this.remoteDescriptionSet = true;
-            console.log("✅ Answer başarıyla set edildi.");
-
-            // ICE kuyruğu
-            this.pendingCandidates.forEach(async (candidate) => {
-                try {
-                    await this.peer.addIceCandidate(new RTCIceCandidate(candidate));
-                } catch (err) {
-                    console.error("❌ ICE kuyruğu hatası:", err);
-                }
-            });
-            this.pendingCandidates = [];
-
-        } catch (err) {
-            console.error("❌ Answer set edilirken hata:", err);
-        }
-    }
-
 
     async handleCandidate(candidate) {
         if (!this.peer) {
@@ -215,8 +197,48 @@ class WebRTCService {
             this.socket.send(JSON.stringify({ ...message, roomId: this.roomId }));
         }
     }
+
+    async shareScreen() {
+        try {
+            const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+
+            const screenTrack = screenStream.getVideoTracks()[0];
+
+            // 🎥 Local ekrana da göster
+            if (this.localVideoRef.current) {
+                this.localVideoRef.current.srcObject = screenStream;
+            }
+
+            // 🎯 Peer'daki video sender'ı bul
+            const videoSender = this.peer.getSenders().find(
+                (sender) => sender.track?.kind === 'video'
+            );
+
+            if (videoSender) {
+                await videoSender.replaceTrack(screenTrack);
+                console.log("🖥️ Ekran paylaşımı başladı");
+
+                // Paylaşım bitince kameraya geri dön
+                screenTrack.onended = async () => {
+                    if (this.localStream) {
+                        const cameraTrack = this.localStream.getVideoTracks()[0];
+                        if (cameraTrack) {
+                            await videoSender.replaceTrack(cameraTrack);
+                            this.localVideoRef.current.srcObject = this.localStream;
+                            console.log("🎥 Kamera geri alındı");
+                        }
+                    }
+                };
+            }
+        } catch (error) {
+            console.error("❌ Ekran paylaşımı hatası:", error);
+        }
+    }
+
 }
 
 export default WebRTCService;
+
+
 
 
