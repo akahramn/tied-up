@@ -40,7 +40,8 @@ public class WebRtcSignalingHandler extends TextWebSocketHandler {
 
             System.out.println("🟢 Katılan: " + session.getId() + " → " + roomId);
         }
-        else if (type.equals("offer") || type.equals("answer") || type.equals("candidate")) {
+
+        if (type.equals("offer") || type.equals("candidate")) {
             String roomId = json.getString("roomId");
             List<WebSocketSession> sessionList = rooms.get(roomId);
 
@@ -54,6 +55,21 @@ public class WebRtcSignalingHandler extends TextWebSocketHandler {
                 }
             }
         }
+
+        if (type.equals("answer")) {
+            String roomId = json.getString("roomId");
+            List<WebSocketSession> sessionList = rooms.get(roomId);
+
+            if (sessionList != null) {
+                for (WebSocketSession s : sessionList) {
+                    // Kendine geri gönderme! Sadece karşı tarafa gönder
+                    if (s != session && s.isOpen()) {
+                        s.sendMessage(new TextMessage(message.getPayload()));
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
