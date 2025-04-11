@@ -1,8 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import WebRTCService from '../services/WebRTCService';
 import {useParams} from "react-router-dom";
-import {Button, Space} from "antd";
-import Title from "antd/es/skeleton/Title";
+
+import { Layout, Row, Col, Avatar, Space, Button, Card, theme } from 'antd';
+import {
+    AudioOutlined,
+    AudioMutedOutlined,
+    VideoCameraOutlined,
+    ShareAltOutlined,
+    MessageOutlined,
+    PoweroffOutlined,
+    AppstoreAddOutlined,
+} from '@ant-design/icons';
+import './LiveClassroom.css'; // pastel tonları için custom stil
+
+const { Header, Footer, Content, Sider } = Layout;
+
+const participants = Array.from({ length: 2 }, (_, i) => ({
+    name: `Öğrenci ${i + 1}`,
+    id: i,
+}));
+
 
 const LiveSession = () => {
     const localVideoRef = useRef(null);
@@ -51,41 +69,59 @@ const LiveSession = () => {
 
 
     return (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <Title level={2}>Canlı Ders (WebRTC)</Title>
+        <Layout className="classroom-layout">
+            {/* Üst bar */}
+            <Header className="header-bar">
+                <Space>
+                    <Avatar size="large">👩‍🏫</Avatar>
+                    <span className="class-title">Canlı Ders: Matematik</span>
+                </Space>
+            </Header>
 
-            <Space style={{ justifyContent: 'center', marginBottom: '2rem' }}>
-                <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    width={320}
-                    height={240}
-                    style={{ border: '1px solid #ccc' }}
-                />
-                <video
-                    ref={remoteVideoRef}
-                    autoPlay
-                    playsInline
-                    width={320}
-                    height={240}
-                    style={{ border: '1px solid #ccc' }}
-                />
-            </Space>
+            <Layout>
+                {/* Yan Panel */}
+                <Sider width={280} className="side-panel">
+                    <div className="side-title">Araçlar</div>
+                    <Space direction="vertical" size="large" className="side-buttons">
+                        <Button icon={<MessageOutlined />} block>Chat</Button>
+                        <Button icon={<AppstoreAddOutlined />} block>Whiteboard</Button>
+                        <Button icon={<ShareAltOutlined />} block>Ekran Paylaşımı</Button>
+                    </Space>
+                </Sider>
 
-            {isInstructor == 1 &&
-            <Space direction="vertical">
-                <Button type="primary" onClick={handleStartCall}>
-                    Bağlantıyı Başlat (Eğitmen)
-                </Button>
+                <Layout>
+                    {/* Görüntüler */}
+                    <Content className="video-area">
+                        <Row gutter={[16, 16]} className="video-grid">
+                            <Col span={24}>
+                                <Card className="main-speaker" title="Aktif Konuşan">
+                                    <div className="video-box">🎤 Eğitmen Görüntüsü</div>
+                                </Card>
+                            </Col>
 
-                <Button onClick={handleShareScreen} disabled={!isInstructor}>
-                    Ekran Paylaşımı Başlat
-                </Button>
-            </Space>
-            }
-        </div>
+                            {participants.map((p) => (
+                                <Col xs={12} md={6} key={p.id}>
+                                    <Card title={p.name} className="participant-card">
+                                        <div className="video-box small">🎥</div>
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                    </Content>
+
+                    {/* Alt bar */}
+                    <Footer className="control-footer">
+                        <Space size="middle">
+                            <Button shape="circle" icon={<AudioOutlined />} />
+                            <Button shape="circle" icon={<AudioMutedOutlined />} />
+                            <Button shape="circle" icon={<VideoCameraOutlined />} />
+                            <Button shape="circle" icon={<ShareAltOutlined />} />
+                            <Button danger shape="circle" icon={<PoweroffOutlined />} />
+                        </Space>
+                    </Footer>
+                </Layout>
+            </Layout>
+        </Layout>
     );
 };
 
