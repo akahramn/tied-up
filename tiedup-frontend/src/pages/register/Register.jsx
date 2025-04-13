@@ -2,13 +2,15 @@
 import React from 'react';
 import { Form, Input, Button, Typography, Select, Card } from 'antd';
 import { Link } from 'react-router-dom';
+import {register} from "../../services/authService";
 
 const { Option } = Select;
 
 const Register = () => {
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         console.log('Kayıt Bilgileri:', values);
-        // TODO: API çağrısı
+        const response = await register(values);
+        console.log(response.data);
     };
 
     return (
@@ -27,7 +29,11 @@ const Register = () => {
                 </div>
 
                 <Form layout="vertical" onFinish={onFinish}>
-                    <Form.Item name="fullName" label="Ad Soyad" rules={[{ required: true, message: 'Adınızı girin' }]}>
+                    <Form.Item name="firstname" label="Ad" rules={[{ required: true, message: 'Adınızı girin' }]}>
+                        <Input />
+                    </Form.Item>
+
+                    <Form.Item name="lastname" label="Soyad" rules={[{ required: true, message: 'Soyadınızı girin' }]}>
                         <Input />
                     </Form.Item>
 
