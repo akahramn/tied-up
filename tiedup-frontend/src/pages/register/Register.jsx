@@ -1,4 +1,3 @@
-// src/pages/Register.js
 import React from 'react';
 import { Form, Input, Button, Typography, Select, Card } from 'antd';
 import { Link } from 'react-router-dom';
@@ -9,8 +8,13 @@ const { Option } = Select;
 const Register = () => {
     const onFinish = async (values) => {
         console.log('Kayıt Bilgileri:', values);
-        const response = await register(values);
-        console.log(response.data);
+        try {
+            const response = await register(values);
+            console.log("RESPPP",response.data);
+        } catch (error) {
+            console.log("HATA", error.response.data.message);
+        }
+
     };
 
     return (
