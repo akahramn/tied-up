@@ -20,17 +20,19 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName("localhost");
         redisStandaloneConfiguration.setPort(6379);
+        redisStandaloneConfiguration.setPassword("mypass"); // 🔥 Şifre burada eklendi
         redisStandaloneConfiguration.setDatabase(0);
 
-        //Her bağlantıda yeni connection açmak yerine connection pooldaki connectionları kullanıyoruz
-        GenericObjectPoolConfig<Jedis> genericObjectPoolConfig = new GenericObjectPoolConfig<Jedis>();
+        GenericObjectPoolConfig<Jedis> genericObjectPoolConfig = new GenericObjectPoolConfig<>();
         genericObjectPoolConfig.setMaxTotal(10);
         genericObjectPoolConfig.setMaxIdle(5);
         genericObjectPoolConfig.setMinIdle(2);
 
         JedisClientConfigurationBuilder jedisClientConfiguration = JedisClientConfiguration.builder();
-        jedisClientConfiguration.connectTimeout(Duration.ofSeconds(1));// 1s connection timeout
-        jedisClientConfiguration.usePooling().poolConfig(genericObjectPoolConfig);
+        jedisClientConfiguration
+                .connectTimeout(Duration.ofSeconds(1))
+                .usePooling()
+                .poolConfig(genericObjectPoolConfig);
 
         return new JedisConnectionFactory(redisStandaloneConfiguration,
                 jedisClientConfiguration.build());

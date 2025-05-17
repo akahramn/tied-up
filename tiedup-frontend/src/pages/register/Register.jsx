@@ -51,8 +51,8 @@ const Register = () => {
 
                     <Form.Item name="role" label="Rol" rules={[{ required: true, message: 'Rol seçin' }]}>
                         <Select placeholder="Rol Seçin">
-                            <Option value="student">Öğrenci</Option>
-                            <Option value="instructor">Eğitmen</Option>
+                            <Option value="STUDENT">Öğrenci</Option>
+                            <Option value="INSTRUCTOR">Eğitmen</Option>
                         </Select>
                     </Form.Item>
 

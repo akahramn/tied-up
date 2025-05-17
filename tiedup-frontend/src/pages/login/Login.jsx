@@ -1,22 +1,21 @@
 // src/pages/Login.js
 import React from 'react';
-import {Form, Input, Button, Typography, Card} from 'antd';
+import {Form, Input, Button, Typography, Card, message} from 'antd';
 import { Link } from 'react-router-dom';
 import {login} from "../../services/authService";
 
 const Login = () => {
     const onFinish = async (values) => {
         try {
-            console.log('Giriş Bilgileri:', values);
             const loginResponse = await login(values);
             if (loginResponse && loginResponse.status === 200) {
                 localStorage.setItem('token', loginResponse.data.access_token);
-                localStorage.setItem('user', JSON.stringify(loginResponse.data));
-                window.location.href = "/live/0";
+                localStorage.setItem('fullname', loginResponse.data.full_name);
+                localStorage.setItem('role', loginResponse.data.role);
+                window.location.href = "/";
             }
-            console.log("RESPONSE",loginResponse);
         } catch (error) {
-            console.log("HATAAAA");
+            message.error(error.response.data.message);
         }
 
     };
