@@ -40,9 +40,9 @@ public class AuthenticationController {
         String clientIp = httpServletRequest.getRemoteAddr();
 
         // Rate limit kontrolü
-        if (!rateLimiterService.isAllowed(clientIp)) {
-            return ResponseEntity.status(429).body("Çok fazla giriş denemesi yaptınız. Lütfen 10 dakika sonra tekrar deneyin.");
-        }
+//        if (!rateLimiterService.isAllowed(clientIp)) {
+//            return ResponseEntity.status(429).body("Çok fazla giriş denemesi yaptınız. Lütfen 10 dakika sonra tekrar deneyin.");
+//        }
         return ResponseEntity.ok(service.login(request, httpServletRequest));
     }
 
