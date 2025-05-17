@@ -1,6 +1,7 @@
 package com.tiedup.server.security.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tiedup.server.exception.custom.InvalidCredentialsException;
 import com.tiedup.server.mail.MailService;
 import com.tiedup.server.security.auth.dto.*;
 import com.tiedup.server.security.config.JwtService;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,12 +56,16 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(AuthenticationRequest request, HttpServletRequest httpRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (AuthenticationException ex) {
+            throw new InvalidCredentialsException("E-posta veya şifre hatalı.");
+        }
         var user = userService.findByEmail(request.getEmail());
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -71,6 +77,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .fullName(user.getFullName())
+                .role(user.getRole())
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.tiedup.server.security.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tiedup.server.user.type.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,8 @@ public class AuthenticationResponse {
     private String accessToken;
     @JsonProperty("refresh_token")
     private String refreshToken;
+    @JsonProperty("full_name")
+    private String fullName;
+    @JsonProperty("role")
+    private Role role;
 }
