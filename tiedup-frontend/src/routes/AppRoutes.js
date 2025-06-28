@@ -17,7 +17,7 @@ const AppRoutes = ({ user }) => {
                 <Route path="courses" element={<Course />} />
                 <Route path="courses/create" element={<Course />} />
                 <Route path="explore" element={<Course />} />
-                <Route path="calendar" element={<UserCalendar />} />
+                <Route path="/calendar" element={<UserCalendar />} />
                 <Route path="notes" element={<SharedNotes />} />
                 <Route path="billing" element={<SubscriptionPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
