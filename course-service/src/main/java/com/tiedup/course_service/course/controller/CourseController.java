@@ -35,7 +35,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-    @GetMapping("/fetch-course-by-id")
+    @GetMapping("/fetch-course-by-id/{id}")
     public ResponseEntity<CourseResponse> getCourseById(@PathVariable UUID id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
