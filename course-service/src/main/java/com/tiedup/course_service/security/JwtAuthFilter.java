@@ -42,8 +42,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         Claims claims = jwtUtil.extractClaims(token);
         String role = jwtUtil.extractRole(token); // Kullanıcı rolünü JWT'den oku
-        UUID userId = UUID.fromString(claims.getSubject()); // Kullanıcı ID'yi al
-        UserDetails userDetails = new CurrentUser(userId, "user", "", role);
+        String username = claims.getSubject(); // Kullanıcı ID'yi al
+        UserDetails userDetails = new CurrentUser(null, username, "", role);
 
         var authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities()
