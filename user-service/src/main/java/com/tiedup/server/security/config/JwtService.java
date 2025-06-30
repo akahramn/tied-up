@@ -77,6 +77,7 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
+    //TODO UserId set edilmeli diğer servisler userId ile kontrol ediyor security
     private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,

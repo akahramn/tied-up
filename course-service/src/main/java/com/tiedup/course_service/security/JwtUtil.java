@@ -2,6 +2,7 @@ package com.tiedup.course_service.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +14,14 @@ public class JwtUtil {
 
     private static final String SECRET_KEY = "8pyIi1skgLqIBPVqCYFdKgYpyzfwWlArb75bKWz9Z5fcSmkHYvCcBiFOiFoGOvA1P0vifPRPHGsJiP6RwIt0VgEE0Vt6UBAlgZEs4u248Q6t5afBppAapasJSP2KyHJw8ZKVQ7RwTLi2Gl892di5cFr868KHFQW6DE0EbuhZECo70qTC3dFD4K2BsXjXiRgF8Sc61MyxZtluF0b9aqwyk3ktelI2YJldUbGZwhZIHYwLuVyik5vzHgGeLVwe5eh2"; // User Service ile aynı olmalı!
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
