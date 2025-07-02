@@ -1,5 +1,5 @@
-import {Button, Layout, Typography} from "antd";
-import {LogoutOutlined} from "@ant-design/icons";
+import {Avatar, Button, Layout, Space, Typography} from "antd";
+import {LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import React from "react";
 import {Content, Header} from "antd/es/layout/layout";
 
@@ -7,30 +7,38 @@ import {Content, Header} from "antd/es/layout/layout";
 const CustomHeader = ({fullName, handleLogout, children}) => {
 
     return (
-    <Layout>
         <Header
             style={{
-                background: '#fff',
-                padding: '0 24px',
+                backgroundColor: '#ffffff',
+                height: '64px',
+                padding: '0 32px',
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                justifyContent: 'space-between',
+                width: '100%',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 1000,
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
             }}
         >
-            <Typography.Title level={4} style={{ margin: 0 }}>
-                Hoş geldin, {fullName || 'kullanıcı'}
+            {/* Sol Logo / Başlık */}
+            <Typography.Title level={5} style={{ margin: 0 }}>
+                🎓 TiedUp Panel
             </Typography.Title>
-            <Button icon={<LogoutOutlined />} onClick={handleLogout}>
-                Çıkış Yap
-            </Button>
-        </Header>
 
-        <Content style={{ margin: '24px', padding: 24, background: '#F5F7F0' }}>
-            {children}
-        </Content>
-    </Layout>
-    )
+            {/* Sağ Kullanıcı Bilgisi */}
+            <Space>
+                <Typography.Text strong>{fullName || 'Kullanıcı'}</Typography.Text>
+                <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#B5DDA4' }} />
+                <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout}>
+                    Çıkış Yap
+                </Button>
+            </Space>
+        </Header>
+    );
 }
 
 export default CustomHeader;
