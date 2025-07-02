@@ -13,7 +13,7 @@ import {
     MessageOutlined,
     HomeOutlined,
 } from '@ant-design/icons';
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export const menuConfig = {
     STUDENT: [
@@ -26,41 +26,45 @@ export const menuConfig = {
     ],
 
     ADMIN: [
-        { key: 'dashboard', label: 'Panel', icon: <HomeOutlined />, path: '/dashboard' },
-        { key: 'create-course', label: 'Ders Oluştur', icon: <PlusCircleOutlined />, path: '/dashboard/courses/create' },
-        { key: 'participants', label: 'Katılımcılarım', icon: <TeamOutlined />, path: '/dashboard/participants' },
-        { key: 'my-courses', label: 'Derslerim', icon: <BookOutlined />, path: '/dashboard/my-courses' },
-        { key: 'share-note', label: 'Not Paylaş', icon: <UploadOutlined />, path: '/dashboard/notes/share' },
-        { key: 'calendar', label: 'Ders Takvimi', icon: <CalendarOutlined />, path: '/dashboard/calendar' },
-        { key: 'billing', label: 'Abonelik', icon: <CreditCardOutlined />, path: '/dashboard/billing' },
-        { key: 'messages', label: 'Mesajlar', icon: <MessageOutlined />, path: '/dashboard/messages' },
+        { key: 'dashboard', label: 'Panel', icon: <HomeOutlined />, path: '/' },
+        { key: 'create-course', label: 'Ders Oluştur', icon: <PlusCircleOutlined />, path: '/courses/create' },
+        { key: 'participants', label: 'Katılımcılarım', icon: <TeamOutlined />, path: '/participants' },
+        { key: 'courses', label: 'Derslerim', icon: <BookOutlined />, path: '/courses' },
+        { key: 'calendar', label: 'Ders Takvimi', icon: <CalendarOutlined />, path: '/calendar' },
+        { key: 'billing', label: 'Abonelik', icon: <CreditCardOutlined />, path: '/billing' },
+        { key: 'messages', label: 'Mesajlar', icon: <MessageOutlined />, path: '/messages' },
     ],
 
     INSTRUCTOR: [
-        // Eğer INSTRUCTOR ayrı bir rolsen yine ADMIN ile aynı yapıyı kullanabilirsin:
-        // ...menuConfig.ADMIN
+        { key: 'dashboard', label: 'Panel', icon: <HomeOutlined />, path: '/' },
+        { key: 'courses', label: 'Derslerim', icon: <BookOutlined />, path: '/courses' },
+        { key: 'participants', label: 'Katılımcılarım', icon: <TeamOutlined />, path: '/participants' },
+        { key: 'calendar', label: 'Ders Takvimi', icon: <CalendarOutlined />, path: '/calendar' },
+        { key: 'billing', label: 'Abonelik', icon: <CreditCardOutlined />, path: '/billing' },
+        { key: 'messages', label: 'Mesajlar', icon: <MessageOutlined />, path: '/messages' },
     ]
 };
 
-const Sidebar = ({fullName, role, navigate}) => {
+const Sidebar = ({ fullName, role }) => {
+    const navigate = useNavigate();
     const location = useLocation();
 
-    const selectedKey = useMemo(() => {
-        const current = location.pathname;
-        const items = menuConfig[role] || [];
-        const matched = items.find((item) => current.startsWith(item.path));
-        return matched?.key || 'dashboard';
-    }, [location.pathname, role]);
+    // Menü item'larını dinamik olarak oluştur
+    const menuItems = menuConfig[role]?.map((item) => ({
+        key: item.key,
+        icon: item.icon,
+        label: item.label,
+        path: item.path,
+    })) || [];
 
-    const menuItems = useMemo(() => menuConfig[role] || [], [role]);
+    // Aktif route'a göre seçili item'ı belirle
+    const selectedKey = menuItems.find(item => location.pathname.endsWith(item.path))?.key;
 
     return (
         <Sider
             breakpoint="lg"
             collapsedWidth="0"
-            style={{
-                backgroundColor: '#B5DDA4',
-            }}
+            style={{ backgroundColor: '#B5DDA4' }}
         >
             <div style={{ padding: 16, textAlign: 'center' }}>
                 <Avatar size={64} icon={<UserOutlined />} />
@@ -69,20 +73,23 @@ const Sidebar = ({fullName, role, navigate}) => {
                 </Typography.Title>
             </div>
 
-            <Menu theme="light" mode="inline" style={{ backgroundColor: '#B5DDA4' }}>
-                {menuItems.map((item) => (
-                    <Menu.Item
-                        key={item.key}
-                        icon={item.icon}
-                        onClick={() => navigate(item.path)}
-                        style={{ color: '#2E4E2B', fontWeight: 500 }}
-                    >
-                        {item.label}
-                    </Menu.Item>
-                ))}
-            </Menu>
+            <Menu
+                theme="light"
+                mode="inline"
+                selectedKeys={[selectedKey]}
+                style={{ backgroundColor: '#B5DDA4' }}
+                items={menuItems.map(item => ({
+                    key: item.key,
+                    icon: item.icon,
+                    label: item.label,
+                }))}
+                onClick={({ key }) => {
+                    const target = menuItems.find(item => item.key === key);
+                    if (target) navigate(target.path);
+                }}
+            />
         </Sider>
-    )
-}
+    );
+};
 
 export default Sidebar;
