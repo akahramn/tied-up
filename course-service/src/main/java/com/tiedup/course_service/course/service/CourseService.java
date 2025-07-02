@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +36,8 @@ public class CourseService {
                 .price(request.getPrice())
                 .status(CourseStatus.ACTIVE)
                 .instructorId(request.getInstructorId())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         Course savedCourse = courseRepository.save(course);
@@ -49,10 +52,12 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
-    public CourseResponse getCourseById(UUID id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ders bulunamadı!"));
-        return CourseMapper.INSTANCE.courseToCourseResponse(course);
+    public List<CourseResponse> getCourseListByInstructorId(UUID id) {
+        List<Course> courseList = courseRepository.findCoursesByInstructorId(id);
+
+        return courseList.stream()
+                .map(CourseMapper.INSTANCE::courseToCourseResponse)
+                .collect(Collectors.toList());
     }
 
     public CourseResponse updateCourse(UUID id, CourseRequest request) {
@@ -107,5 +112,10 @@ public class CourseService {
 
         course.setStatus(CourseStatus.valueOf(request.getStatus()));
         courseRepository.save(course);
+    }
+
+    public CourseResponse getCourseById(UUID id) {
+        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Ders bulunamadı."));
+        return CourseMapper.INSTANCE.courseToCourseResponse(course);
     }
 }

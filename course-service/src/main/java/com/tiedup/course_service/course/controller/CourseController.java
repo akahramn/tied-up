@@ -35,9 +35,14 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-    @GetMapping("/fetch-course-by-id/{id}")
+    @GetMapping("/fetch-course-list-by-instructor-id/{id}")
+    public ResponseEntity<List<CourseResponse>> getCourseListByInstructorId(@PathVariable UUID id) {
+        return ResponseEntity.ok().body(courseService.getCourseListByInstructorId(id));
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<CourseResponse> getCourseById(@PathVariable UUID id) {
-        return ResponseEntity.ok(courseService.getCourseById(id));
+        return ResponseEntity.ok().body(courseService.getCourseById(id));
     }
 
     @PreAuthorize("hasAnyRole('INSTRUCTOR')")
