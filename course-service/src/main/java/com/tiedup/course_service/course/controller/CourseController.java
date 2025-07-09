@@ -1,13 +1,13 @@
 package com.tiedup.course_service.course.controller;
 
-import com.tiedup.course_service.course.dto.CourseRequest;
-import com.tiedup.course_service.course.dto.CourseResponse;
-import com.tiedup.course_service.course.dto.CourseStatusUpdateRequest;
-import com.tiedup.course_service.course.dto.EnrollmentRequest;
+import com.tiedup.course_service.course.dto.*;
+import com.tiedup.course_service.course.mapper.CourseMapper;
+import com.tiedup.course_service.course.model.Course;
 import com.tiedup.course_service.course.service.CourseService;
 import com.tiedup.course_service.security.CurrentUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,7 +30,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createCourse(request));
     }
 
-    @GetMapping("/fetch-course-list")
+    @GetMapping("/fetch-all-courses")
     public ResponseEntity<List<CourseResponse>> getAllCourses() {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
@@ -71,5 +71,16 @@ public class CourseController {
                                                    @RequestBody CourseStatusUpdateRequest courseStatusUpdateRequest) {
         courseService.updateCourseStatus(courseStatusUpdateRequest, currentUser.getUserId());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<Page<CourseResponse>> getCoursesWithFilter(
+            @RequestBody CourseFilterRequest filter
+    ) {
+        Page<Course> coursePage = courseService.getCoursesWithFilter(filter);
+
+        Page<CourseResponse> responsePage = coursePage.map(CourseMapper.INSTANCE::courseToCourseResponse);
+
+        return ResponseEntity.ok(responsePage);
     }
 }

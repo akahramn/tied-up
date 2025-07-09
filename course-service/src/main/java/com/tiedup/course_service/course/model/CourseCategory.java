@@ -7,7 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name = "course_category")
+@Table(name = "course_category", schema = "course")
 @Getter
 @Setter
 @NoArgsConstructor

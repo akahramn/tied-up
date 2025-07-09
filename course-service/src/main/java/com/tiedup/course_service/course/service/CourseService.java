@@ -1,19 +1,22 @@
 package com.tiedup.course_service.course.service;
 
-import com.tiedup.course_service.course.dto.CourseRequest;
-import com.tiedup.course_service.course.dto.CourseResponse;
-import com.tiedup.course_service.course.dto.CourseStatusUpdateRequest;
-import com.tiedup.course_service.course.dto.EnrollmentRequest;
+import com.tiedup.course_service.course.dto.*;
+import com.tiedup.course_service.course.enums.EnrollmentStatus;
 import com.tiedup.course_service.course.mapper.CourseMapper;
 import com.tiedup.course_service.course.model.Course;
 import com.tiedup.course_service.course.model.Enrollment;
 import com.tiedup.course_service.course.repository.CourseRepository;
 import com.tiedup.course_service.course.repository.EnrollmentRepository;
+import com.tiedup.course_service.course.specification.CourseSpecification;
 import com.tiedup.course_service.course.type.CourseStatus;
 import com.tiedup.course_service.exception.ForbiddenException;
 import com.tiedup.course_service.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -95,6 +98,9 @@ public class CourseService {
         Enrollment enrollment = Enrollment.builder()
                 .course(course)
                 .studentId(enrollmentRequest.getStudentId())
+                .note(enrollmentRequest.getNote())
+                .status(EnrollmentStatus.PENDING)
+                .requestDate(LocalDateTime.now())
                 .build();
 
         enrollmentRepository.save(enrollment);
@@ -117,5 +123,15 @@ public class CourseService {
     public CourseResponse getCourseById(UUID id) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Ders bulunamadı."));
         return CourseMapper.INSTANCE.courseToCourseResponse(course);
+    }
+
+    public Page<Course> getCoursesWithFilter(CourseFilterRequest filter) {
+        Pageable pageable = PageRequest.of(
+                filter.getPage(),
+                filter.getSize(),
+                Sort.by(Sort.Direction.fromString(filter.getSortDirection()), filter.getSortBy())
+        );
+
+        return courseRepository.findAll(CourseSpecification.build(filter), pageable);
     }
 }

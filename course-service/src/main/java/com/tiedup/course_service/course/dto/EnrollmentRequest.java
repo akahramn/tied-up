@@ -15,4 +15,6 @@ public class EnrollmentRequest {
     private UUID studentId;
     @NotNull
     private UUID courseId;
+    @NotNull
+    private String note;
 }
