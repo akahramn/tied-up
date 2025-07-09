@@ -1,52 +1,92 @@
-import {Avatar, Button, Card, Col, Input, List, message, Modal, Row, Space, Tabs, Typography, Upload} from 'antd';
 import {
-    CalendarOutlined, DollarOutlined,
-    EditOutlined,
-    FileTextOutlined,
-    StarFilled,
-    TeamOutlined,
-    UploadOutlined,
-    VideoCameraOutlined
+    CalendarOutlined, TeamOutlined, DollarOutlined,
+    UploadOutlined, VideoCameraOutlined,
+    FileTextOutlined, LockOutlined, StarFilled
 } from '@ant-design/icons';
-import {useParams} from 'react-router-dom';
-import React, {useEffect, useState} from 'react';
+import {
+    Avatar, Button, Card, Col, Input, List, Modal,
+    Row, Space, Tabs, Tooltip, Typography, Upload, message
+} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import {getCourseById} from "../../services/course/CourseService";
+import {enrollCourse, getCourseById} from "../../services/course/CourseService"; // kendi axios instance'ını buradan import et
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
+const { TextArea } = Input;
+
+const isInstructor = (user, course) => user?.role === 'INSTRUCTOR' && course?.instructorId === user?.id;
+const isStudent = (user) => user?.role === 'STUDENT';
 
 const CourseDetail = ({ user }) => {
     const { id } = useParams();
-
+    const [course, setCourse] = useState(null);
     const [materialModalOpen, setMaterialModalOpen] = useState(false);
     const [materialTitle, setMaterialTitle] = useState('');
     const [fileList, setFileList] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [course, setCourse] = useState(null);
+    const [newComment, setNewComment] = useState('');
+    const [enrollment, setEnrollment] = useState(null);
+
+    // Kayıt talebi modalı için
+    const [requestModalOpen, setRequestModalOpen] = useState(false);
+    const [enrollmentMessage, setEnrollmentMessage] = useState('');
+
+    /*useEffect(() => {
+        console.log("SETUP");
+        setup()
+    })*/
+
 
     useEffect(() => {
-        setup()
+        console.log("DENEME");
+        fetchCourse();
     }, [id]);
 
-    const setup = () => {
-        getCourseById(id).then(res => setCourse(res.data));
+    const setup = async () => {
+        fetchCourse();
     }
 
-    const handleMaterialUpload = () => {
-        if (!materialTitle || fileList.length === 0) {
-            message.warning("Başlık ve dosya yüklemelisiniz.");
-            return;
+    const fetchCourse = async () => {
+        try {
+            const res = await getCourseById(id);
+            setCourse(res.data);
+            setEnrollment(res.data.enrollments.find(e => e.studentId === user?.id));
+        } catch (err) {
+            console.error("Kurs verisi alınırken hata:", err);
         }
-        // API çağrısı yapılabilir
-        message.success("Materyal başarıyla eklendi.");
-        setMaterialModalOpen(false);
-        setMaterialTitle('');
-        setFileList([]);
     };
 
-    if (!course) return <p>Yükleniyor...</p>;
+    const handleMaterialUpload = () => {
+        // Upload işlemi (geliştirilecek)
+        setMaterialModalOpen(false);
+        setFileList([]);
+        setMaterialTitle('');
+    };
 
-    const isLiveAvailable = dayjs(course.date).isBefore(dayjs().add(15, 'minute'));
+    const handleCommentSubmit = () => {
+        // Yorum gönderme işlemi
+        console.log('Yeni yorum:', newComment);
+        setNewComment('');
+    };
+
+    const handleEnrollmentRequest = async () => {
+        try {
+            const data = {
+                studentId: user?.id,
+                courseId: course?.id,
+                note: enrollmentMessage
+            };
+           await enrollCourse(data);
+            message.success("Kayıt talebiniz gönderildi.");
+            setRequestModalOpen(false);
+            fetchCourse(); // sayfayı güncelle
+        } catch (err) {
+            console.error(err);
+            message.error("Talep gönderilirken hata oluştu.");
+        }
+    };
+
+    if (!course) return <Paragraph>Yükleniyor...</Paragraph>;
 
     return (
         <Card style={{ background: '#fff', padding: 24 }}>
@@ -62,16 +102,30 @@ const CourseDetail = ({ user }) => {
                     </Space>
                 </Col>
 
-                {(user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN') && (
+                {(isInstructor(user, course) || user?.role === 'ADMIN') && (
                     <Col xs={24} sm={12} md={16}>
                         <Space wrap>
-                            <Button icon={<UploadOutlined />}>
+                            <Button icon={<UploadOutlined />} onClick={() => setMaterialModalOpen(true)}>
                                 Materyal Ekle
                             </Button>
                             <Button icon={<VideoCameraOutlined />} type="dashed">
                                 Canlı Derse Başla
                             </Button>
                         </Space>
+                    </Col>
+                )}
+
+                {isStudent(user) && enrollment == null && (
+                    <Col span={24}>
+                        <Button type="primary" onClick={() => setRequestModalOpen(true)}>
+                            Kayıt Talebi Gönder
+                        </Button>
+                    </Col>
+                )}
+
+                {isStudent(user) && enrollment !== null && enrollment.status === "PENDING" && (
+                    <Col span={24}>
+                        <Paragraph type="secondary">Kayıt talebiniz eğitmen tarafından değerlendiriliyor.</Paragraph>
                     </Col>
                 )}
             </Row>
@@ -81,35 +135,46 @@ const CourseDetail = ({ user }) => {
                     <Paragraph>{course.longDescription || 'Bu ders hakkında detaylı bilgi yakında.'}</Paragraph>
                 </Tabs.TabPane>
 
-                <Tabs.TabPane tab="Katılımcılar" key="2">
-                    {course.participants?.length > 0 ? (
-                        <List
-                            dataSource={course.participants}
-                            renderItem={(p) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        avatar={<Avatar>{p.name?.charAt(0)}</Avatar>}
-                                        title={p.name}
-                                        description={p.email}
-                                    />
-                                </List.Item>
-                            )}
-                        />
-                    ) : <Paragraph>Henüz katılımcı yok.</Paragraph>}
-                </Tabs.TabPane>
+                {(isInstructor(user, course) || user?.role === 'ADMIN') && (
+                    <Tabs.TabPane tab="Katılımcılar" key="2">
+                        {course.participants?.length > 0 ? (
+                            <List
+                                dataSource={course.participants}
+                                renderItem={(p) => (
+                                    <List.Item>
+                                        <List.Item.Meta
+                                            avatar={<Avatar>{p.name?.charAt(0)}</Avatar>}
+                                            title={p.name}
+                                            description={p.email}
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        ) : <Paragraph>Henüz katılımcı yok.</Paragraph>}
+                    </Tabs.TabPane>
+                )}
 
                 <Tabs.TabPane tab="Materyaller" key="3">
-                    {course.materials?.length > 0 ? (
-                        <List
-                            dataSource={course.materials}
-                            renderItem={(m) => (
-                                <List.Item>
-                                    <FileTextOutlined style={{ marginRight: 8 }} />
-                                    <a href={m.url} target="_blank" rel="noreferrer">{m.title}</a>
-                                </List.Item>
-                            )}
-                        />
-                    ) : <Paragraph>Henüz materyal eklenmedi.</Paragraph>}
+                    <List
+                        dataSource={course.materials}
+                        renderItem={(material) => (
+                            <List.Item>
+                                <FileTextOutlined style={{ marginRight: 8 }} />
+                                {enrollment !== null && enrollment.status === "SUCCESS" ?  (
+                                    <a href={material.url} target="_blank" rel="noreferrer">
+                                        {material.title}
+                                    </a>
+                                ) : (
+                                    <Tooltip title="Bu materyali görmek için derse kayıt olun.">
+                                        <span style={{ color: 'gray', cursor: 'not-allowed' }}>
+                                            <LockOutlined style={{ marginRight: 4 }} />
+                                            {material.title}
+                                        </span>
+                                    </Tooltip>
+                                )}
+                            </List.Item>
+                        )}
+                    />
                 </Tabs.TabPane>
 
                 <Tabs.TabPane tab="Yorumlar" key="4">
@@ -127,6 +192,20 @@ const CourseDetail = ({ user }) => {
                             )}
                         />
                     ) : <Paragraph>Henüz yorum yapılmadı.</Paragraph>}
+
+                    {enrollment !== null && enrollment.status === "SUCCESS" && (
+                        <div style={{ marginTop: 16 }}>
+                            <TextArea
+                                rows={3}
+                                placeholder="Yorumunuzu yazın..."
+                                value={newComment}
+                                onChange={e => setNewComment(e.target.value)}
+                            />
+                            <Button type="primary" onClick={handleCommentSubmit} style={{ marginTop: 8 }}>
+                                Gönder
+                            </Button>
+                        </div>
+                    )}
                 </Tabs.TabPane>
             </Tabs>
 
@@ -155,6 +234,23 @@ const CourseDetail = ({ user }) => {
                 >
                     <Button icon={<UploadOutlined />}>Dosya Seç</Button>
                 </Upload>
+            </Modal>
+
+            {/* Kayıt Talebi Modal */}
+            <Modal
+                title="Kayıt Talebi Gönder"
+                open={requestModalOpen}
+                onOk={handleEnrollmentRequest}
+                onCancel={() => setRequestModalOpen(false)}
+                okText="Gönder"
+                cancelText="İptal"
+            >
+                <TextArea
+                    rows={4}
+                    placeholder="Eğitmene bir mesaj bırakabilirsiniz..."
+                    value={enrollmentMessage}
+                    onChange={e => setEnrollmentMessage(e.target.value)}
+                />
             </Modal>
         </Card>
     );

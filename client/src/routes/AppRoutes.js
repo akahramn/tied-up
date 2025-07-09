@@ -7,6 +7,7 @@ import UserCalendar from "../pages/calendar/UserCalendar";
 import SharedNotes from "../pages/notes/SharedNotes";
 import SubscriptionPage from "../pages/billing/SubscriptionPage";
 import CourseDetail from "../pages/course/CourseDetail";
+import ExploreCourses from "../pages/explore/ExploreCourses";
 
 
 const AppRoutes = ({ user }) => {
@@ -18,7 +19,7 @@ const AppRoutes = ({ user }) => {
                 {/*Course*/}
                 <Route path="courses" element={<Course user={user} />} />
                 <Route path="courses/:id" element={<CourseDetail user={user} />} />
-                <Route path="explore" element={<Course />} />
+                <Route path="explore" element={<ExploreCourses user={user} />} />
                 <Route path="calendar" element={<UserCalendar />} />
                 <Route path="notes" element={<SharedNotes />} />
                 <Route path="notes/share" element={<SharedNotes />} />

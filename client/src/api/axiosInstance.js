@@ -16,4 +16,16 @@ instance.interceptors.request.use((config) => {
     return config;
 });
 
+//401 durumunda login sayfasına yönlendir
+instance.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token'); // Token'ı temizle
+            window.location.href = '/login'; // Login sayfasına yönlendir
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default instance;
